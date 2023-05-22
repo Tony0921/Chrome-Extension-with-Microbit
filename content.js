@@ -1,13 +1,26 @@
 chrome.runtime.onMessage.addListener(
     function (message, sender, sendResponse) {
         if (message.type === "connect") {
-            
+            connect();
         }
     }
 );
 let port;
 const connectButton = document.createElement('button');
-const dataContainer = document.createElement('div');
+// const dataContainer = document.createElement('div');
+
+async function connect(){
+    try {
+        port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 115200 });
+        reader = port.readable.getReader();
+
+        connectButton.disabled = true;
+        readLoop();
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
 
 connectButton.addEventListener('click', async () => {
     try {
@@ -57,7 +70,7 @@ function processInput(input) {
             buffer = '';
             buffer += value; 
         } else if (value === '#') {
-            dataContainer.textContent = buffer;
+            // dataContainer.textContent = buffer;
             console.log(buffer); 
         } else {
             buffer += value;  
