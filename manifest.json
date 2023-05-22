@@ -1,0 +1,21 @@
+{
+	"manifest_version": 3,
+	"name": "ChatGPT with Microbit",
+	"version": "1.0",
+	"description": "Connect Microbit to ChatGPT",
+
+	"content_scripts": [
+		{
+			"matches": ["https://chat.openai.com/*"],
+			"css": ["content.css"],
+			"js": ["content.js"]
+			
+		}
+	],
+
+       
+	"action": {
+		"default_title": "ChatGPT with Microbit",
+		"default_popup": "popup/popup.html"
+	}
+}
