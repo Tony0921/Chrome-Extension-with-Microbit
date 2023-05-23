@@ -71,9 +71,38 @@ function processInput(input) {
             buffer += value; 
         } else if (value === '#') {
             // dataContainer.textContent = buffer;
-            console.log(buffer); 
+            console.log(buffer);
+            setFieldValue(buffer);
         } else {
             buffer += value;  
         }
+    }
+}
+
+function setFieldValue(value) {
+    var inputField = document.getElementsByTagName("textarea")[0];
+    inputField.value = value;
+
+    // set textfield height
+    if (inputField.scrollHeight < 200) {
+        inputField.setAttribute("style", " max-height:200px; height:" + (inputField.scrollHeight) + "px; overflow-y: hidden;");
+    } else {
+        inputField.setAttribute("style", "max-height:200px; height:" + (inputField.scrollHeight) + "px;");
+    }
+}
+
+function getSendBtn() {
+    var element_1 = document.querySelectorAll('button.absolute.p-1');
+    return element_1[0];
+}
+
+function checkFieldValue(value) {
+    var sendBtn = getSendBtn();
+
+    // enable button
+    if (value != "") {
+        sendBtn.disabled = false;
+    } else {
+        sendBtn.disabled = true;
     }
 }
