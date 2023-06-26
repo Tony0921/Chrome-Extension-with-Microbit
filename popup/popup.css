@@ -28,3 +28,13 @@ button {
     box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
     /* add box shadow */
 }
+
+button:hover {
+    background-color: #45A44F;
+}
+
+button:disabled {
+    opacity: 0.5; /* 降低透明度以表示禁用狀態 */
+    cursor: not-allowed; /* 將滑鼠游標設為不允許的樣式 */
+    /* 可以添加其他樣式來自訂禁用狀態下的外觀 */
+  }
