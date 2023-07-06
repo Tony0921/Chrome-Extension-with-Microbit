@@ -1,4 +1,41 @@
 let isConnect = false;
+let nowStateData = '';
+
+
+let canSend = true;
+var interval_1 = setInterval(function () {
+    var rs = document.getElementsByClassName("result-streaming");
+    if (rs.length == 0) {
+        canSend = true;
+    } else {
+        canSend = false;
+    }
+}, 1000);
+
+
+
+// async function sendToMicroBit() {
+//     if (nowStateData == '') return;
+    
+//     var gpt_ans = document.querySelectorAll('div.markdown.prose'); //gpt回答
+//     // 取得最後一個物件
+//     const lastObject = gpt_ans[gpt_ans.length - 1];
+
+//     // 等待回答完成
+//     while (!canSend) {
+//         await new Promise(resolve => setTimeout(resolve, 1000));
+//     }
+
+//     setTimeout(function () {
+//         console.log("三秒已過，顯示訊息！");
+//     }, 3000);
+
+//     setFieldValue(buffer);
+//     clickSend();
+// }
+
+// var interval_2 = setInterval(sendToMicroBit, 1000);
+
 
 chrome.runtime.onMessage.addListener(
     function (message, sender, sendResponse) {
@@ -21,8 +58,7 @@ chrome.runtime.onMessage.addListener(
 );
 let port;
 const connectButton = document.createElement('button');
-// const dataContainer = document.createElement('div');
-var first_prompt = "目前環境中的光度(light)和溫度temperature)，光度範圍為0~255，溫度以攝氏度表示，環境中有日光燈、檯燈、冷氣機、電風扇、電暖爐可供使用，請依據環境參數提供生活建議，字數不超過 30 字，以上說明若清楚，請回答 我瞭解了";
+const first_prompt = "目前環境中的光度(light)和溫度temperature)，光度範圍為0~255，溫度以攝氏度表示，環境中有日光燈、檯燈、冷氣機、電風扇、電暖爐可供使用，請依據環境參數提供生活建議，字數不超過 30 字，以上說明若清楚，請回答 我瞭解了";
 
 async function connect() {
     try {
@@ -30,20 +66,22 @@ async function connect() {
         await port.open({ baudRate: 115200 });
         reader = port.readable.getReader();
 
-        // connectButton.disabled = true;
         isConnect = true;
         setFieldValue(first_prompt);
         clickSend();
 
         readLoop();
     } catch (error) {
-        console.error('Error:', error);
+        if (error.message === "Failed to execute 'requestPort' on 'Serial': No port selected by the user.") {
+            console.log("User cancelled port selection");
+        } else {
+            console.error('Error:', error);
+        }
     }
 }
 
-let disconnecting = false;
-
 async function disconnect() {
+    let disconnecting = false;
     try {
         if (port && !disconnecting) {
             disconnecting = true;
@@ -60,7 +98,6 @@ async function disconnect() {
 
             disconnecting = false;
         }
-        // connectButton.disabled = false;
         isConnect = false;
     } catch (error) {
         disconnecting = false;
@@ -87,7 +124,6 @@ async function readLoop() {
     } finally {
         reader.releaseLock();
         port.close();
-        // connectButton.disabled = false;
         isConnect = false;
     }
 }
@@ -104,10 +140,10 @@ function processInput(input) {
             buffer = '';
             buffer += value;
         } else if (value === '#') {
-            // dataContainer.textContent = buffer;
             console.log(buffer);
-            setFieldValue(buffer);
-            clickSend();
+            nowStateData = buffer;
+            // setFieldValue(buffer);
+            // clickSend();
         } else {
             buffer += value;
         }
