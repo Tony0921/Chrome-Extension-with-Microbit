@@ -25,15 +25,24 @@ async function sendToMicroBit() {
     const lastObject = gpt_ans[gpt_ans.length - 1];
     console.log(lastObject.innerText);
 
-    // var message = "#";
-
     // serial 傳送字串
-    var message = lastObject.innerText + "#"; // 你可以在此處添加你想要傳送的資訊
+    var message = lastObject.innerText; // 你可以在此處添加你想要傳送的資訊
+
+    // 使用正则表达式匹配状态
+    const ledStatus = message.match(/LED lights: (ON|OFF)/i)[1];
+    const acStatus = message.match(/air conditioners: (ON|OFF)/i)[1];
+    const heaterStatus = message.match(/electric heaters: (ON|OFF)/i)[1];
+
+    console.log("擷取結果");
+    console.log("LED lights:", ledStatus);
+    console.log("Air conditioners:", acStatus);
+    console.log("Electric heaters:", heaterStatus);
+
 
     // serial 傳送字串
     if(port.writable){
         const writer = port.writable.getWriter();
-        const data = new TextEncoder().encode(message);
+        const data = new TextEncoder().encode(ledStatus + " " + acStatus + " " + heaterStatus + "#");
         writer.write(data);
         writer.releaseLock();
     }
@@ -158,6 +167,7 @@ function processInput(input) {
             nowStateData = buffer;
             setFieldValue(buffer);
             clickSend();
+            sendToMicroBit();
         } else {
             buffer += value;
         }
@@ -188,5 +198,5 @@ function clickSend() {
     var sendBtn = getSendBtn();
     sendBtn.click();
     canSend = false;
-    sendToMicroBit();
+    
 }
