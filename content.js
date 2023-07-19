@@ -12,30 +12,32 @@ var interval_1 = setInterval(function () {
     }
 }, 1000);
 
+async function sendToMicroBit() {
+    if (nowStateData == '') return;
 
+    // 等待回答完成
+    while (!canSend) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
 
-// async function sendToMicroBit() {
-//     if (nowStateData == '') return;
-    
-//     var gpt_ans = document.querySelectorAll('div.markdown.prose'); //gpt回答
-//     // 取得最後一個物件
-//     const lastObject = gpt_ans[gpt_ans.length - 1];
+    var gpt_ans = document.querySelectorAll('div.markdown.prose'); //gpt回答
+    // 取得最後一個物件
+    const lastObject = gpt_ans[gpt_ans.length - 1];
+    console.log(lastObject.innerText);
 
-//     // 等待回答完成
-//     while (!canSend) {
-//         await new Promise(resolve => setTimeout(resolve, 1000));
-//     }
+    // var message = "#";
 
-//     setTimeout(function () {
-//         console.log("三秒已過，顯示訊息！");
-//     }, 3000);
+    // serial 傳送字串
+    var message = lastObject.innerText + "#"; // 你可以在此處添加你想要傳送的資訊
 
-//     setFieldValue(buffer);
-//     clickSend();
-// }
-
-// var interval_2 = setInterval(sendToMicroBit, 1000);
-
+    // serial 傳送字串
+    if(port.writable){
+        const writer = port.writable.getWriter();
+        const data = new TextEncoder().encode(message);
+        writer.write(data);
+        writer.releaseLock();
+    }
+}
 
 chrome.runtime.onMessage.addListener(
     function (message, sender, sendResponse) {
@@ -59,7 +61,19 @@ chrome.runtime.onMessage.addListener(
 let port;
 const connectButton = document.createElement('button');
 const first_prompt = "目前環境中的光度(light)和溫度temperature)，光度範圍為0~255，溫度以攝氏度表示，環境中有日光燈、檯燈、冷氣機、電風扇、電暖爐可供使用，請依據環境參數提供生活建議，字數不超過 30 字，以上說明若清楚，請回答 我瞭解了";
+const first_prompt_en = `I will provide you with information about the current light intensity (light) and temperature(temperature) in the environment. The light intensity ranges from 0 to 255, larger number is lighter,the target light intensity is 100. The temperature is in Celsius, and target temperature target is 26.
 
+There are LED lights, air conditioners and electric heaters available in the environment. turn on fluorescent lights will increase light intensity,vice versa. Turn on air conditioners will reduce temperature. Turn on electric heaters will increase temperature.
+
+Based on the environmental parameters give the control command about turn on of off these available devices to reach target light intensity and temperature based on provided values.
+
+only show the control format without any other words:
+
+LED lights : {ON|OFF}
+air conditioners: {ON|OFF}
+electric heaters: {ON|OFF}
+
+If the instructions are clear, please respond with 'I understand.'`;
 async function connect() {
     try {
         port = await navigator.serial.requestPort();
@@ -67,7 +81,7 @@ async function connect() {
         reader = port.readable.getReader();
 
         isConnect = true;
-        setFieldValue(first_prompt);
+        setFieldValue(first_prompt_en);
         clickSend();
 
         readLoop();
@@ -142,8 +156,8 @@ function processInput(input) {
         } else if (value === '#') {
             console.log(buffer);
             nowStateData = buffer;
-            // setFieldValue(buffer);
-            // clickSend();
+            setFieldValue(buffer);
+            clickSend();
         } else {
             buffer += value;
         }
@@ -174,4 +188,5 @@ function clickSend() {
     var sendBtn = getSendBtn();
     sendBtn.click();
     canSend = false;
+    sendToMicroBit();
 }
