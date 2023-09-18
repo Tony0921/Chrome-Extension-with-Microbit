@@ -5,7 +5,7 @@ body {
     font-family: Arial, sans-serif;
 }
 
-.btn-row1{
+.btn-row1 {
     display: flex;
     justify-content: space-between;
     margin: 0 20px;
@@ -34,7 +34,41 @@ button:hover {
 }
 
 button:disabled {
-    opacity: 0.5; /* 降低透明度以表示禁用狀態 */
-    cursor: not-allowed; /* 將滑鼠游標設為不允許的樣式 */
+    opacity: 0.5;
+    /* 降低透明度以表示禁用狀態 */
+    cursor: not-allowed;
+    /* 將滑鼠游標設為不允許的樣式 */
     /* 可以添加其他樣式來自訂禁用狀態下的外觀 */
-  }
+}
+
+/* 美化輸入框 */
+.input-field {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.input-field input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* 可選：美化輸入框在獲得焦點時的樣式 */
+.input-field input:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+.input-field input:disabled {
+    background-color: #f2f2f2;
+    /* 设置背景颜色 */
+    color: #999;
+    /* 设置文字颜色 */
+    border: 1px solid #ccc;
+    /* 设置边框样式 */
+    cursor: not-allowed;
+    /* 设置鼠标样式为不可用 */
+}

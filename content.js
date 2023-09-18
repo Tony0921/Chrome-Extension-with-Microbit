@@ -1,48 +1,83 @@
 let isConnect = false;
 let nowStateData = '';
 
+let inputVal_1 = "LED lights";
+let inputVal_2 = "Air conditioners";
+let inputVal_3 = "Electric heaters";
 
 let canSend = true;
 var interval_1 = setInterval(function () {
-    var rs = document.getElementsByClassName("result-streaming");
+    // var rs = document.getElementsByClassName("result-streaming");
+    var rs = document.querySelectorAll('div.result-streaming.markdown');
+    // console.log(rs);
+    var tag1 = document.querySelectorAll('div.markdown.prose');
+    var tag2 = document.querySelectorAll('div.flex.flex-col.items-start');
+    if (tag2.length / tag1.length != 2.0){
+        // console.log('F');
+        return;
+    }
+
     if (rs.length == 0) {
         canSend = true;
     } else {
+        // console.log('canSend F');
         canSend = false;
     }
 }, 1000);
 
 async function sendToMicroBit() {
+    // console.log('send to microbit');
     if (nowStateData == '') return;
+    // console.log('no return');
 
     // 等待回答完成
     while (!canSend) {
+        console.log('wait');
         await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
     var gpt_ans = document.querySelectorAll('div.markdown.prose'); //gpt回答
     // 取得最後一個物件
     const lastObject = gpt_ans[gpt_ans.length - 1];
-    console.log(lastObject.innerText);
+    // console.log(lastObject.innerText);
 
     // serial 傳送字串
     var message = lastObject.innerText; // 你可以在此處添加你想要傳送的資訊
 
+    let outputVal_1 = '';
+    let outputVal_2 = '';
+    let outputVal_3 = '';
+
     // 使用正则表达式匹配状态
-    const ledStatus = message.match(/LED lights: (ON|OFF)/i)[1];
-    const acStatus = message.match(/air conditioners: (ON|OFF)/i)[1];
-    const heaterStatus = message.match(/electric heaters: (ON|OFF)/i)[1];
-
-    console.log("擷取結果");
-    console.log("LED lights:", ledStatus);
-    console.log("Air conditioners:", acStatus);
-    console.log("Electric heaters:", heaterStatus);
-
+    try {
+        outputVal_1 = message.match(new RegExp(`${inputVal_1}: (ON|OFF)`, "i"))[0];
+        // 处理成功匹配的情况
+    } catch (error) {
+        // 处理找不到匹配或其他错误的情况
+        console.error(`Error processing inputVal_1: ${error.message}`);
+    }
+    
+    try {
+        outputVal_2 = message.match(new RegExp(`${inputVal_2}: (ON|OFF)`, "i"))[0];
+        // 处理成功匹配的情况
+    } catch (error) {
+        // 处理找不到匹配或其他错误的情况
+        console.error(`Error processing inputVal_2: ${error.message}`);
+    }
+    
+    try {
+        outputVal_3 = message.match(new RegExp(`${inputVal_3}: (ON|OFF)`, "i"))[0];
+        // 处理成功匹配的情况
+    } catch (error) {
+        // 处理找不到匹配或其他错误的情况
+        console.error(`Error processing inputVal_3: ${error.message}`);
+    }
+    
 
     // serial 傳送字串
     if(port.writable){
         const writer = port.writable.getWriter();
-        const data = new TextEncoder().encode(ledStatus + " " + acStatus + " " + heaterStatus + "#");
+        const data = new TextEncoder().encode(outputVal_1 + "," + outputVal_2 + "," + outputVal_3 + "#");
         writer.write(data);
         writer.releaseLock();
     }
@@ -50,39 +85,54 @@ async function sendToMicroBit() {
 
 chrome.runtime.onMessage.addListener(
     function (message, sender, sendResponse) {
-        if (message.type === "connect") {
+        if (message.method === "connect") {
             connect();
         }
-        if (message.type === "disconnect") {
+        if (message.method === "disconnect") {
             disconnect();
         }
+        if (message.method === "saveData") {
+            // console.log(message.data.input_1);
+            // console.log(message.data.input_2);
+            // console.log(message.data.input_3);
+            // console.log(message.method);
+            inputVal_1 = message.data.input_1;
+            inputVal_2 = message.data.input_2;
+            inputVal_3 = message.data.input_3;
+        }
         if (message.method === "getData") {
-            console.log(message.method);
+            // console.log(message.method);
             if (isConnect) {
-                sendResponse({ data: 'CONNECTED' }); // 這裡填寫你希望回傳給popup的資料
+                sendResponse({ status: 'CONNECTED', inputData: {input_1: inputVal_1, input_2: inputVal_2, input_3: inputVal_3 } }); // 這裡填寫你希望回傳給popup的資料
             }
             else {
-                sendResponse({ data: 'DISSCONECT' }); // 這裡填寫你希望回傳給popup的資料
+                sendResponse({ status: 'DISSCONECT', inputData: {input_1: inputVal_1, input_2: inputVal_2, input_3: inputVal_3 } }); // 這裡填寫你希望回傳給popup的資料
             }
+            // sendResponse({ inputData: {input_1: inputVal_1, input_2: inputVal_2, input_3: inputVal_3 } })
         }
     }
 );
 let port;
 const connectButton = document.createElement('button');
-const first_prompt = "目前環境中的光度(light)和溫度temperature)，光度範圍為0~255，溫度以攝氏度表示，環境中有日光燈、檯燈、冷氣機、電風扇、電暖爐可供使用，請依據環境參數提供生活建議，字數不超過 30 字，以上說明若清楚，請回答 我瞭解了";
-const first_prompt_en = `I will provide you with information about the current light intensity (light) and temperature(temperature) in the environment. The light intensity ranges from 0 to 255, larger number is lighter,the target light intensity is 100. The temperature is in Celsius, and target temperature target is 26.
+// const first_prompt = "目前環境中的光度(light)和溫度temperature)，光度範圍為0~255，溫度以攝氏度表示，環境中有日光燈、檯燈、冷氣機、電風扇、電暖爐可供使用，請依據環境參數提供生活建議，字數不超過 30 字，以上說明若清楚，請回答 我瞭解了";
 
-There are LED lights, air conditioners and electric heaters available in the environment. turn on fluorescent lights will increase light intensity,vice versa. Turn on air conditioners will reduce temperature. Turn on electric heaters will increase temperature.
+function setFirstPrompt(val_1, val_2, val_3){
+    let first_prompt_en = `I will provide you with information about the current light intensity (light) and temperature(temperature) in the environment. The light intensity ranges from 0 to 255, larger number is lighter,the target light intensity is 100. The temperature is in Celsius, and target temperature target is 26.
+
+There are LED lights(${val_1}), air conditioners(${val_2}) and electric heaters(${val_3}) available in the environment. turn on fluorescent lights will increase light intensity,vice versa. Turn on air conditioners will reduce temperature. Turn on electric heaters will increase temperature.
 
 Based on the environmental parameters give the control command about turn on of off these available devices to reach target light intensity and temperature based on provided values.
 
 only show the control format without any other words:
 
-LED lights : {ON|OFF}
-air conditioners: {ON|OFF}
-electric heaters: {ON|OFF}
+${val_1}: {ON|OFF}
+${val_2}: {ON|OFF}
+${val_3}: {ON|OFF}
 
 If the instructions are clear, please respond with 'I understand.'`;
+    return first_prompt_en;
+}
+
 async function connect() {
     try {
         port = await navigator.serial.requestPort();
@@ -90,7 +140,14 @@ async function connect() {
         reader = port.readable.getReader();
 
         isConnect = true;
-        setFieldValue(first_prompt_en);
+       
+        a = setFirstPrompt(inputVal_1, inputVal_2, inputVal_3);
+
+        //  a=first_prompt_en;
+        // console.log(first_prompt_en);
+        console.log(a);
+        console.log(inputVal_1, inputVal_2, inputVal_3);
+        setFieldValue(a);
         clickSend();
 
         readLoop();
