@@ -1,5 +1,5 @@
 body {
-    min-width: 300px;
+    min-width: 700px;
     min-height: 80px;
     background-color: #f5f5f5;
     font-family: Arial, sans-serif;
@@ -42,13 +42,23 @@ button:disabled {
 }
 
 /* 美化輸入框 */
-.input-field {
+.input-field1, .input-field2 {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.input-field input {
+.input-field1 textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    
+    height: 150px; /* 設置高度，決定顯示的行數 */
+    resize: none; /* 禁止調整大小，如果需要可以刪除此行 */
+}
+
+.input-field2 input {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -56,13 +66,13 @@ button:disabled {
 }
 
 /* 可選：美化輸入框在獲得焦點時的樣式 */
-.input-field input:focus {
+.input-field1 textarea:focus, .input-field2 input:focus {
     border-color: #3498db;
     outline: none;
     box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
 }
 
-.input-field input:disabled {
+.input-field1 textarea:disabled, .input-field2 input:disabled {
     background-color: #f2f2f2;
     /* 设置背景颜色 */
     color: #999;
@@ -71,4 +81,8 @@ button:disabled {
     /* 设置边框样式 */
     cursor: not-allowed;
     /* 设置鼠标样式为不可用 */
+}
+
+p {
+    margin: 0px 5px;
 }

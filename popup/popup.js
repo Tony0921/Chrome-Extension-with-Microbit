@@ -42,6 +42,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     const connectBtn = document.getElementById("connect-btn");
     const disconnectBtn = document.getElementById("disconnect-btn");
+    const input_prompt = document.getElementById("input-prompt");
     const input_1 = document.getElementById("input-1");
     const input_2 = document.getElementById("input-2");
     const input_3 = document.getElementById("input-3");
@@ -61,17 +62,22 @@ document.addEventListener("DOMContentLoaded", function () {
             connectBtn.disabled = isConnected;
             disconnectBtn.disabled = !isConnected;
             // console.log(response.inputData);
+            input_prompt.value = response.inputData.input_prompt;
             input_1.value = response.inputData.input_1;
             input_2.value = response.inputData.input_2;
             input_3.value = response.inputData.input_3;
 
+            input_prompt.disabled = isConnected;
             input_1.disabled = isConnected;
             input_2.disabled = isConnected;
             input_3.disabled = isConnected;
         }
     }
 
-    function replaceWords(value){
+    function replaceValWords(value){
+        return value.replace(/[^A-Za-z0-9\s-_]/g, '');
+    }
+    function replacePromptWords(value){
         return value.replace(/[^A-Za-z0-9\s-_]/g, '');
     }
 
@@ -93,19 +99,24 @@ document.addEventListener("DOMContentLoaded", function () {
         queryTabsAndSendMessage({ method: "getData" }, handleResponse);
     });
 
+    input_prompt.addEventListener('blur', function (event) {
+        // input_prompt.value = replacePromptWords(input_prompt.value);
+        queryTabsAndSendMessage({ method: "saveData", data: {input_prompt: input_prompt.value, input_1: input_1.value, input_2: input_2.value, input_3: input_3.value}});
+    });
+
     input_1.addEventListener('blur', function (event) {
-        input_1.value = replaceWords(input_1.value);
-        queryTabsAndSendMessage({ method: "saveData", data: {input_1: input_1.value, input_2: input_2.value, input_3: input_3.value}});
+        input_1.value = replaceValWords(input_1.value);
+        queryTabsAndSendMessage({ method: "saveData", data: {input_prompt: input_prompt.value, input_1: input_1.value, input_2: input_2.value, input_3: input_3.value}});
     });
 
     input_2.addEventListener('blur', function (event) {
-        input_2.value = replaceWords(input_2.value);
-        queryTabsAndSendMessage({ method: "saveData", data: {input_1: input_1.value, input_2: input_2.value, input_3: input_3.value}});
+        input_2.value = replaceValWords(input_2.value);
+        queryTabsAndSendMessage({ method: "saveData", data: {input_prompt: input_prompt.value, input_1: input_1.value, input_2: input_2.value, input_3: input_3.value}});
     });
 
     input_3.addEventListener('blur', function (event) {
-        input_3.value = replaceWords(input_3.value);
-        queryTabsAndSendMessage({ method: "saveData", data: {input_1: input_1.value, input_2: input_2.value, input_3: input_3.value}});
+        input_3.value = replaceValWords(input_3.value);
+        queryTabsAndSendMessage({ method: "saveData", data: {input_prompt: input_prompt.value, input_1: input_1.value, input_2: input_2.value, input_3: input_3.value}});
     });
 
     queryTabsAndSendMessage({ method: "getData" }, handleResponse);

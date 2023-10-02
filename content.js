@@ -4,7 +4,21 @@ let nowStateData = '';
 let inputVal_1 = "LED lights";
 let inputVal_2 = "Air conditioners";
 let inputVal_3 = "Electric heaters";
+let inputVal_prompt = `I will provide you with information about the current light intensity (light) and temperature(temperature) in the environment. The light intensity ranges from 0 to 255, larger number is lighter,the target light intensity is 100. The temperature is in Celsius, and target temperature target is 26.
 
+There are LED lights({{variable_1}}), air conditioners({{variable_2}}) and electric heaters({{variable_3}}) available in the environment. turn on fluorescent lights will increase light intensity,vice versa. Turn on air conditioners will reduce temperature. Turn on electric heaters will increase temperature.
+
+Based on the environmental parameters give the control command about turn on of off these available devices to reach target light intensity and temperature based on provided values.
+
+only show the control format without any other words:
+
+{{variable_1}}: {ON|OFF}
+{{variable_2}}: {ON|OFF}
+{{variable_3}}: {ON|OFF}
+
+If the instructions are clear, please respond with 'I understand.'`;
+
+// 偵測GPT回答  狀態
 let canSend = true;
 var interval_1 = setInterval(function () {
     // var rs = document.getElementsByClassName("result-streaming");
@@ -13,22 +27,18 @@ var interval_1 = setInterval(function () {
     var tag1 = document.querySelectorAll('div.markdown.prose');
     var tag2 = document.querySelectorAll('div.flex.flex-col.items-start');
     if (tag2.length / tag1.length != 2.0){
-        // console.log('F');
         return;
     }
 
     if (rs.length == 0) {
         canSend = true;
     } else {
-        // console.log('canSend F');
         canSend = false;
     }
 }, 1000);
 
 async function sendToMicroBit() {
-    // console.log('send to microbit');
     if (nowStateData == '') return;
-    // console.log('no return');
 
     // 等待回答完成
     while (!canSend) {
@@ -92,10 +102,7 @@ chrome.runtime.onMessage.addListener(
             disconnect();
         }
         if (message.method === "saveData") {
-            // console.log(message.data.input_1);
-            // console.log(message.data.input_2);
-            // console.log(message.data.input_3);
-            // console.log(message.method);
+            inputVal_prompt = message.data.input_prompt;
             inputVal_1 = message.data.input_1;
             inputVal_2 = message.data.input_2;
             inputVal_3 = message.data.input_3;
@@ -103,12 +110,11 @@ chrome.runtime.onMessage.addListener(
         if (message.method === "getData") {
             // console.log(message.method);
             if (isConnect) {
-                sendResponse({ status: 'CONNECTED', inputData: {input_1: inputVal_1, input_2: inputVal_2, input_3: inputVal_3 } }); // 這裡填寫你希望回傳給popup的資料
+                sendResponse({ status: 'CONNECTED', inputData: {input_prompt: inputVal_prompt, input_1: inputVal_1, input_2: inputVal_2, input_3: inputVal_3 } }); // 這裡填寫你希望回傳給popup的資料
             }
             else {
-                sendResponse({ status: 'DISSCONECT', inputData: {input_1: inputVal_1, input_2: inputVal_2, input_3: inputVal_3 } }); // 這裡填寫你希望回傳給popup的資料
+                sendResponse({ status: 'DISSCONECT', inputData: {input_prompt: inputVal_prompt, input_1: inputVal_1, input_2: inputVal_2, input_3: inputVal_3 } }); // 這裡填寫你希望回傳給popup的資料
             }
-            // sendResponse({ inputData: {input_1: inputVal_1, input_2: inputVal_2, input_3: inputVal_3 } })
         }
     }
 );
@@ -116,21 +122,9 @@ let port;
 const connectButton = document.createElement('button');
 // const first_prompt = "目前環境中的光度(light)和溫度temperature)，光度範圍為0~255，溫度以攝氏度表示，環境中有日光燈、檯燈、冷氣機、電風扇、電暖爐可供使用，請依據環境參數提供生活建議，字數不超過 30 字，以上說明若清楚，請回答 我瞭解了";
 
-function setFirstPrompt(val_1, val_2, val_3){
-    let first_prompt_en = `I will provide you with information about the current light intensity (light) and temperature(temperature) in the environment. The light intensity ranges from 0 to 255, larger number is lighter,the target light intensity is 100. The temperature is in Celsius, and target temperature target is 26.
-
-There are LED lights(${val_1}), air conditioners(${val_2}) and electric heaters(${val_3}) available in the environment. turn on fluorescent lights will increase light intensity,vice versa. Turn on air conditioners will reduce temperature. Turn on electric heaters will increase temperature.
-
-Based on the environmental parameters give the control command about turn on of off these available devices to reach target light intensity and temperature based on provided values.
-
-only show the control format without any other words:
-
-${val_1}: {ON|OFF}
-${val_2}: {ON|OFF}
-${val_3}: {ON|OFF}
-
-If the instructions are clear, please respond with 'I understand.'`;
-    return first_prompt_en;
+function setOutputPrompt(val_1, val_2, val_3){
+    let outpput_prompt = inputVal_prompt.replace(/{{variable_1}}/g,val_1).replace(/{{variable_2}}/g, val_2).replace(/{{variable_3}}/g, val_3);
+    return outpput_prompt;
 }
 
 async function connect() {
@@ -141,13 +135,11 @@ async function connect() {
 
         isConnect = true;
        
-        a = setFirstPrompt(inputVal_1, inputVal_2, inputVal_3);
+        resault = setOutputPrompt(inputVal_1, inputVal_2, inputVal_3);
 
-        //  a=first_prompt_en;
-        // console.log(first_prompt_en);
-        console.log(a);
+        console.log(resault);
         console.log(inputVal_1, inputVal_2, inputVal_3);
-        setFieldValue(a);
+        setFieldValue(resault);
         clickSend();
 
         readLoop();
