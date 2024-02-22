@@ -15,7 +15,7 @@ ChatGPT with Microbit is a Chrome extension that connects your Microbit device t
 
 **Method one: Installation via WebStore**
 
-1. Open the Chrome browser and navigate to the [ChatGPT with Microbit](https://chromewebstore.google.com/detail/chatgpt-with-microbit/akadceddkkjpncchmgoojfpfaeelekha?fbclid=IwAR0hxwztQHCPKoJD-R0WsPtGB1Yy53At17W4-QhxBznYYeobLtCwZrhvtm0) on the Chrome Web Store.
+1. Open the Chrome browser and navigate to the [ChatGPT with Microbit](https://chromewebstore.google.com/detail/chatgpt-with-microbit/akadceddkkjpncchmgoojfpfaeelekha) on the Chrome Web Store.
 2. Click on "Add to Chrome".
 3. Follow the on-screen instructions to complete the installation.
 

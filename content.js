@@ -64,7 +64,7 @@ async function sendToMicroBit() {
         // 处理成功匹配的情况
     } catch (error) {
         // 处理找不到匹配或其他错误的情况
-        console.error(`Error processing inputVal_1: ${error.message}`);
+        console.log(`[Error processing inputVal_1] ${error.message}`);
     }
     
     try {
@@ -72,7 +72,7 @@ async function sendToMicroBit() {
         // 处理成功匹配的情况
     } catch (error) {
         // 处理找不到匹配或其他错误的情况
-        console.error(`Error processing inputVal_2: ${error.message}`);
+        console.log(`[Error processing inputVal_2] ${error.message}`);
     }
     
     try {
@@ -80,7 +80,7 @@ async function sendToMicroBit() {
         // 处理成功匹配的情况
     } catch (error) {
         // 处理找不到匹配或其他错误的情况
-        console.error(`Error processing inputVal_3: ${error.message}`);
+        console.log(`[Error processing inputVal_3] ${error.message}`);
     }
     
 
@@ -139,8 +139,7 @@ async function connect() {
 
         console.log(resault);
         console.log(inputVal_1, inputVal_2, inputVal_3);
-        setFieldValue(resault);
-        clickSend();
+        sendMessageToGPT(resault);
 
         readLoop();
     } catch (error) {
@@ -212,15 +211,21 @@ function processInput(input) {
             buffer = '';
             buffer += value;
         } else if (value === '#') {
-            console.log(buffer);
+            console.log("[buffer] "+buffer);
             nowStateData = buffer;
-            setFieldValue(buffer);
-            clickSend();
+            sendMessageToGPT(buffer);
             sendToMicroBit();
+            // buffer = '';
         } else {
             buffer += value;
         }
     }
+}
+
+function sendMessageToGPT(msg){
+    if(!canSend)return;
+    setFieldValue(msg);
+    clickSend();
 }
 
 function setFieldValue(value) {
@@ -245,7 +250,8 @@ function getSendBtn() {
 
 function clickSend() {
     var sendBtn = getSendBtn();
-    sendBtn.click();
-    canSend = false;
-    
+    if(sendBtn){
+        sendBtn.click();
+        canSend = false;
+    }
 }
