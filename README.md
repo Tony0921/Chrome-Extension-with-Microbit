@@ -1,5 +1,7 @@
 # Chrome-Extension-ChatGPT-with-Microbit
 
+![ChatGPT with Microbit Icon](icons/icon128.png)
+
 ## Overview
 
 ChatGPT with Microbit is a Chrome extension that connects your Microbit device to the OpenAI Chat platform. This extension allows you to control your Microbit and retrieve information from it directly within the OpenAI Chat interface.
