@@ -1,6 +1,6 @@
 /* 基本頁面樣式 */
 body {
-    min-width: 300px;
+    min-width: 400px;
     min-height: 80px;
     font-family: Arial, sans-serif;
     text-align: center;
@@ -29,4 +29,8 @@ button {
 
 button:hover {
     background-color: #45A44F;
+}
+
+img {
+    width: 128px;
 }
