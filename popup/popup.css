@@ -84,7 +84,7 @@ button:disabled {
     border-radius: 5px;
     font-size: 14px;
     
-    height: 150px; /* 設置高度，決定顯示的行數 */
+    height: 140px; /* 設置高度，決定顯示的行數 */
     resize: none; /* 禁止調整大小，如果需要可以刪除此行 */
 }
 
