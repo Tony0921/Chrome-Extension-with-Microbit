@@ -1,14 +1,14 @@
 {
 	"manifest_version": 3,
 	"name": "ChatGPT with Microbit",
-	"version": "1.5",
+	"version": "1.6",
 	"description": "The extension connects Microbit to ChatGPT for interactive control.",
 	"icons": {
 		"128": "icons/icon128.png"
 	},
 	"content_scripts": [
 		{
-			"matches": ["https://chat.openai.com/*"],
+			"matches": ["https://chatgpt.com/*"],
 			"css": ["content.css"],
 			"js": ["content.js"]
 			
