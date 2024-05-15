@@ -244,7 +244,7 @@ function setFieldValue(value) {
 }
 
 function getSendBtn() {
-    var element = document.querySelectorAll('button.absolute[data-testid="send-button"]');
+    var element = document.querySelectorAll('button.mb-1.mr-1.flex.h-8.w-8');
     return element[0];
 }
 
