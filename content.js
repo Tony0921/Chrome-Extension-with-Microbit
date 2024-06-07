@@ -244,7 +244,7 @@ function setFieldValue(value) {
 }
 
 function getSendBtn() {
-    var element = document.querySelectorAll('button.mb-1.mr-1.flex.h-8.w-8');
+    var element = document.querySelectorAll('button[data-testid="fruitjuice-send-button"]');
     return element[0];
 }
 
