@@ -20,17 +20,9 @@ If the instructions are clear, please respond with 'I understand.'`;
 
 // 偵測GPT回答  狀態
 let canSend = true;
-var interval_1 = setInterval(function () {
-    // var rs = document.getElementsByClassName("result-streaming");
-    var rs = document.querySelectorAll('div.result-streaming.markdown');
-    // console.log(rs);
-    var tag1 = document.querySelectorAll('div.markdown.prose');
-    var tag2 = document.querySelectorAll('div.flex.flex-col.items-start');
-    if (tag2.length / tag1.length != 2.0){
-        return;
-    }
-
-    if (rs.length == 0) {
+var intervalID = setInterval(function () {
+    var element = document.querySelectorAll('button[data-testid="send-button"]');
+    if (element.length != 0) {
         canSend = true;
     } else {
         canSend = false;
@@ -244,7 +236,7 @@ function setFieldValue(value) {
 }
 
 function getSendBtn() {
-    var element = document.querySelectorAll('button[data-testid="fruitjuice-send-button"]');
+    var element = document.querySelectorAll('button[data-testid="send-button"]');
     return element[0];
 }
 
